@@ -18,6 +18,7 @@ Things to be done or under consideration for v2.0 of the library.
    
 4. Improve compatibility with other pg modules, primarily with `pg-query-stream`.
    Optionally, with `node-pg-copy-streams`, as its support is non-existent;
+    
    
 5. See if the library can accommodate another database altogether in the future,
    like mySQL, as it already has the perfect generic connection + transaction management.
