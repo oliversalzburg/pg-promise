@@ -1,9 +1,7 @@
 Things to be done or under consideration for v2.0 of the library.
 
 1. Remove `queryResult` from the global scope and add `use strict` to `index.js`.
-
-This one is done.
-
+    This one is done.
 2. Throw away all unnecessary legacy aliases.
 
 Aliases thrown out:
