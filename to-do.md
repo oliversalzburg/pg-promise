@@ -1,12 +1,14 @@
 Things to be done or under consideration for v2.0 of the library.
 
 1. Remove `queryResult` from the global scope and add `use strict` to `index.js`.
+    
     This one is done.
+    
 2. Throw away all unnecessary legacy aliases.
 
-Aliases thrown out:
-* `sequence`, with only `queue` remaining;
-* `queryRaw` and `raw`, with only `result` remaining;
+    Aliases thrown out:
+    * `sequence`, with only `queue` remaining;
+    * `queryRaw` and `raw`, with only `result` remaining;
 
 3. Replace the default `Promise` with `Bluebird v3.0` when it is released,
    and align the release of `pg-promise v2.0` to that date.
