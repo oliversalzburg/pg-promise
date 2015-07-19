@@ -23,3 +23,6 @@ Things to be done or under consideration for v2.0 of the library.
    like mySQL, as it already has the perfect generic connection + transaction management.
 
 6. Documentation require a major overhaul for 2.0
+
+7. See if I can add protection to the protocol against calling generic `query`,
+   and possibly, remove access to generic `query` completely.
