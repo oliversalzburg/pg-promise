@@ -40,6 +40,8 @@
     "bluebird": "2.9",
     "jasmine-node": "1.14",
     "istanbul": "0.3",
-    "coveralls": "2.11"
+    "coveralls": "2.11",
+    "pg-query-stream": "0.7",
+    "JSONStream":"1.x"
   }
 }
