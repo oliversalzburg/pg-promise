@@ -84,6 +84,44 @@ describe("Method stream", function () {
                 }
             });
         });
+        describe("with empty initialization callback", function () {
+            var result;
+            beforeEach(function (done) {
+                var stream = {
+                    _reading: false,
+                    state: 'initialized'
+                };
+                db.stream(stream, dummy)
+                    .then(dummy, function (reason) {
+                        result = reason;
+                        done();
+                    })
+            });
+            it("must throw an error", function () {
+                expect(result).toBe("Stream not initialized.");
+            });
+        });
+        describe("with initialization callback throwing error", function () {
+            var result;
+            beforeEach(function (done) {
+                var stream = {
+                    _reading: false,
+                    state: 'initialized'
+                };
+                db.stream(stream, function () {
+                    throw new Error("initialization error");
+                })
+                    .then(dummy, function (reason) {
+                        result = reason;
+                        done();
+                    })
+            });
+            it("must throw an error", function () {
+                expect(result instanceof Error);
+                expect(result.message).toBe("initialization error");
+            });
+        });
+
         describe("throwing error during query notification", function () {
             var result;
             beforeEach(function (done) {
@@ -109,19 +147,19 @@ describe("Method stream", function () {
         });
 
         describe("with a valid request", function () {
-            var result;
+            var result, count = 0, context;
             beforeEach(function (done) {
                 options.query = function (e) {
+                    context = e;
+                    count++;
                 };
-                var qs = new QueryStream('select * from users where id=$1', [1]);
+                var qs = new QueryStream("select * from users where id=$1", [1]);
                 db.stream(qs, function (stream) {
                     stream.pipe(JSONStream.stringify());
                 })
                     .then(function (data) {
                         result = data;
-                    }, function(reason){
-                        console.log("REASON", reason.message);
-                    })
+                    }, dummy)
                     .finally(function () {
                         done();
                     });
@@ -130,11 +168,48 @@ describe("Method stream", function () {
                 expect(typeof(result)).toBe('object');
                 expect(result.processed).toBe(1);
                 expect(result.duration >= 0).toBe(true);
+                expect(count).toBe(1);
+                expect(context.query).toBe("select * from users where id=$1");
+                expect(JSON.stringify(context.params)).toBe('["1"]');
             });
             afterEach(function () {
                 options.query = null;
             });
         });
+
+        describe("with invalid request", function () {
+            var result, err, context, count = 0;
+            beforeEach(function (done) {
+                options.error = function (error, e) {
+                    err = error;
+                    context = e;
+                    count++;
+                };
+                var qs = new QueryStream('select * from unknown where id=$1', [1]);
+                db.stream(qs, function (stream) {
+                    stream.pipe(JSONStream.stringify());
+                })
+                    .then(dummy, function (reason) {
+                        result = reason;
+                    })
+                    .finally(function () {
+                        done();
+                    });
+            });
+            it("must return the correct data and provide notification", function () {
+                expect(result instanceof Error).toBe(true);
+                expect(result.message).toBe('relation "unknown" does not exist');
+                expect(count).toBe(1);
+                expect(context.query).toBe("select * from unknown where id=$1");
+                expect(JSON.stringify(context.params)).toBe('["1"]');
+                expect(err instanceof Error).toBe(true);
+                expect(err.message).toBe('relation "unknown" does not exist');
+            });
+            afterEach(function () {
+                options.error = null;
+            });
+        });
+
     });
 });
 
